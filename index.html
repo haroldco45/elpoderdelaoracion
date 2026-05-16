@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Poder de la Mujer que Ora - PWA</title>
+    <!-- Tailwind CSS para un diseño limpio y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome para Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Manifiesto para PWA -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkVsIFBvZGVyIGRlIGxhIE11amVyIHF1ZSBPcmEiLAogICJzaG9ydF9uYW1lIjogIk11amVyT3JhUE9AIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiNmZmZmZmYiLAogICJ0aGVtZV9jb2xvciI6ICIjYmQxYTVjIiwKICAiaWNvbnMiOiBbCiAgICB7CiAgICAgICJzcmMiOiAiaHR0cHM6Ly9jZG4taWNvbnMtcG5nLmZsaXRpY29uLmNvbS81MTIvMjg3LzI4NzE3Ny5wbmciLAogICAgICAic2l6ZXMiOiAiNTEyeDUxMiIsCiAgICAgICJ0eXBlIjogImltYWdlL3BuZyIKICAgIH0KICBdCn0=">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Encabezado Principal -->
+    <header class="gradient-bg text-white py-6 px-4 text-center shadow-md sticky top-0 z-50">
+        <h1 class="text-2xl font-bold tracking-wide flex justify-center items-center gap-2">
+            <i class="fas fa-dove"></i> El Poder de la Mujer que Ora
+        </h1>
+        <p class="text-xs opacity-90 mt-1">Transforma tu Vida y tu Entorno con Oración</p>
+        <!-- Geolocalización Estado -->
+        <div id="geo-status" class="text-[10px] bg-purple-900/40 inline-block px-3 py-1 rounded-full mt-2 text-purple-200">
+            <i class="fas fa-location-dot"></i> Buscando ubicación...
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="flex-grow container mx-auto px-4 py-6 max-w-md">
+        
+        <!-- Tarjeta de Progreso -->
+        <div class="bg-white rounded-2xl p-4 mb-6 card-shadow border border-purple-100">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-semibold text-purple-800">Tu Progreso Espiritual</span>
+                <span id="progress-text" class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">0/30 Días</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-purple-600 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Sección del Día Seleccionado / Detalle -->
+        <div id="day-detail-container" class="bg-white rounded-2xl p-6 card-shadow border border-purple-100 mb-6 hidden">
+            <button onclick="closeDay()" class="text-purple-600 text-sm font-semibold mb-4 inline-flex items-center gap-1 hover:underline">
+                <i class="fas fa-arrow-left"></i> Volver a la guía
+            </button>
+            <div id="day-content">
+                <!-- Se llena dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Lista de 30 Días de Oración -->
+        <div id="days-list-container" class="space-y-3">
+            <h2 class="text-lg font-bold text-gray-700 mb-2 pl-1"><i class="fas fa-calendar-alt text-purple-600"></i> Guía de 30 Días</h2>
+            <div id="days-grid" class="grid grid-cols-1 gap-3">
+                <!-- Se inyecta con JavaScript -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Botón Flotante para Compartir Petición Rápida por WhatsApp -->
+    <button onclick="sendQuickPrayer()" class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-xl z-50 flex items-center justify-center transition-transform active:scale-95">
+        <i class="fab fa-whatsapp text-2xl"></i>
+    </button>
+
+    <!-- Pie de página con créditos mandatorios -->
+    <footer class="bg-gray-900 text-gray-400 text-center py-4 text-xs mt-auto border-t border-gray-800">
+        <p class="font-semibold text-gray-300">Hecha por VIBRAS POSITIVAS HM</p>
+        <p class="text-[10px] opacity-60 mt-1">&copy; 2026 Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Lógica de la Aplicación -->
+    <script>
+        // Datos de la Guía basados en el libro de Stormie Omartian
+        const devocionales = [
+            {
+                dia: 1,
+                titulo: "Mi Caminar con Dios",
+                versiculo: "Salmos 139:23-24",
+                texto_versiculo: "Examíname, oh Dios, y conoce mi corazón; pruébame y conoce mi pensamientos; y ve si hay camino de perversidad en mí, y guíame en el camino eterno.",
+                contexto: "Stormie enfatiza que antes de orar efectivamente por otros o por situaciones externas, la mujer debe entregar su propio corazón y motivaciones a Dios, buscando una limpieza interior profunda.",
+                aplicacion: "Hoy evaluaré mis prioridades en la rutina diaria, dejando a un lado el afán para dedicar los primeros minutos del día a la intimidad con el Creador.",
+                oracion: "Señor, transforma mi vida desde adentro. Dame un corazón limpio y alineado a tu propósito."
+            },
+            {
+                dia: 2,
+                titulo: "Mi Esposo y su Liderazgo",
+                versiculo: "Efesios 5:25",
+                texto_versiculo: "Maridos, amad a vuestras mujeres, así como Cristo amó a la iglesia, y se entregó a sí mismo por ella.",
+                contexto: "El libro resalta que la oración de una esposa no es para controlar al esposo, sino para desatar la bendición y sabiduría divina sobre su rol como protector de la familia.",
+                aplicacion: "Evitaré la queja o el reproche directo hoy, y cambiaré ese impulso por una oración silenciosa que interceda por sus decisiones laborales y emocionales.",
+                oracion: "Padre, bendice a mi esposo, dale sabiduría en su liderazgo y guarda su corazón de toda tentación."
+            },
+            {
+                dia: 3,
+                titulo: "La Mente y los Pensamientos",
+                versiculo: "Filipenses 4:8",
+                texto_versiculo: "Por lo demás, hermanos, todo lo que es verdadero, todo lo honesto, todo lo justo, todo lo puro, todo lo amable... en esto pensad.",
+                contexto: "Las batallas más grandes de la mujer ocurren a menudo en la mente mediante la ansiedad y la duda. El libro invita a blindar los pensamientos con la verdad bíblica.",
+                aplicacion: "Cada vez que un pensamiento de temor o inseguridad sobre el futuro me asalte hoy, lo detendré declarando una promesa de paz.",
+                oracion: "Llevo cautivo todo pensamiento a la obediencia de Cristo. Mi mente tiene la paz que sobrepasa todo entendimiento."
+            }
+            // Se pueden expandir los 30 días con la misma estructura exacta.
+        ];
+
+        // Rellenar dinámicamente los días restantes para la demostración completa del layout
+        for (let i = 4; i <= 30; i++) {
+            devocionales.push({
+                dia: i,
+                titulo: `Día ${i}: Fortaleciendo mi Entorno`,
+                versiculo: "Proverbios 31:25",
+                texto_versiculo: "Fuerza y honor son su vestidura; y se ríe de lo por venir.",
+                contexto: "La constancia en la oración edifica un vallado de protección inquebrantable alrededor del hogar y las generaciones futuras.",
+                aplicacion: "Mantendré una actitud de fe inquebrantable frente a los desafíos cotidianos de este día.",
+                oracion: "Señor, revísteme de fuerza y dignidad. Echo fuera todo temor al futuro."
+            });
+        }
+
+        let userLocation = "Ubicación no disponible";
+
+        // Inicialización y carga de progreso
+        document.addEventListener('DOMContentLoaded', () => {
+            initGeo();
+            renderDaysGrid();
+            updateProgressBar();
+        });
+
+        // Geolocalización Obligatoria
+        function initGeo() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(4);
+                        const lon = position.coords.longitude.toFixed(4);
+                        userLocation = `Lat: ${lat}, Lon: ${lon}`;
+                        document.getElementById('geo-status').innerHTML = `<i class="fas fa-location-dot text-green-400"></i> Ubicación Activa: ${userLocation}`;
+                    },
+                    (error) => {
+                        userLocation = "Caucasia, Antioquia (Ref)";
+                        document.getElementById('geo-status').innerHTML = `<i class="fas fa-location-pin-lock text-yellow-400"></i> Usando ubicación base`;
+                    }
+                );
+            } else {
+                userLocation = "No soportado";
+            }
+        }
+
+        // Renderizar la cuadrícula de días
+        function renderDaysGrid() {
+            const grid = document.getElementById('days-grid');
+            grid.innerHTML = '';
+            
+            const completedDays = JSON.parse(localStorage.getItem('completed_days_ora') || '[]');
+
+            devocionales.forEach(item => {
+                const isCompleted = completedDays.includes(item.dia);
+                const card = document.createElement('div');
+                card.className = `p-4 rounded-xl card-shadow border transition-all cursor-pointer flex justify-between items-center ${isCompleted ? 'bg-purple-50 border-purple-300' : 'bg-white border-gray-100 hover:border-purple-200'}`;
+                card.setAttribute('onclick', `showDay(${item.dia})`);
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold ${isCompleted ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-700'}">
+                            ${item.dia}
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-gray-800">${item.titulo}</h3>
+                            <p class="text-xs text-gray-500"><i class="fas fa-book-open text-[10px]"></i> ${item.versiculo}</p>
+                        </div>
+                    </div>
+                    <div onclick="toggleComplete(event, ${item.dia})" class="w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${isCompleted ? 'bg-purple-600 border-purple-600 text-white' : 'border-gray-300 bg-white'}">
+                        ${isCompleted ? '<i class="fas fa-check text-xs"></i>' : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Mostrar Detalle del Día Seleccionado
+        function showDay(diaId) {
+            const item = devocionales.find(d => d.dia === diaId);
+            if (!item) return;
+
+            const completedDays = JSON.parse(localStorage.getItem('completed_days_ora') || '[]');
+            const isCompleted = completedDays.includes(item.dia);
+
+            const content = document.getElementById('day-content');
+            content.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <span class="bg-purple-600 text-white text-xs px-3 py-1 rounded-full font-bold">DÍA ${item.dia}</span>
+                    <h2 class="text-xl font-bold text-gray-800 flex-1 ml-3">${item.titulo}</h2>
+                </div>
+                
+                <div class="bg-purple-50 p-4 rounded-xl border-l-4 border-purple-600 mb-4">
+                    <p class="text-xs font-bold text-purple-900 uppercase tracking-wider mb-1"><i class="fas fa-bible"></i> Capítulo & Versículo</p>
+                    <p class="text-sm italic text-gray-700">"${item.texto_versiculo}"</p>
+                    <span class="text-xs font-bold text-purple-700 block mt-1 text-right">— ${item.versiculo}</span>
+                </div>
+
+                <div class="space-y-4 text-sm text-gray-700">
+                    <div>
+                        <h4 class="font-bold text-purple-800 text-xs uppercase tracking-wider"><i class="fas fa-history"></i> Contexto Espiritual</h4>
+                        <p class="mt-1 leading-relaxed text-gray-600">${item.contexto}</p>
+                    </div>
+                    <hr class="border-gray-100">
+                    <div>
+                        <h4 class="font-bold text-purple-800 text-xs uppercase tracking-wider"><i class="fas fa-bolt"></i> Aplicación a la Realidad Actual</h4>
+                        <p class="mt-1 leading-relaxed text-gray-600">${item.aplicacion}</p>
+                    </div>
+                    <hr class="border-gray-100">
+                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 p-3 rounded-xl border border-purple-100">
+                        <h4 class="font-bold text-pink-700 text-xs uppercase tracking-wider"><i class="fas fa-heart"></i> Motivo de Oración del Día</h4>
+                        <p class="mt-1 italic text-gray-700 font-medium">"${item.oracion}"</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-gray-100 flex gap-2">
+                    <button onclick="shareWhatsApp(${item.dia})" class="flex-1 bg-green-500 text-white py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-green-600">
+                        <i class="fab fa-whatsapp text-sm"></i> Compartir Petición
+                    </button>
+                    <button onclick="inlineToggleComplete(${item.dia})" class="flex-1 py-2.5 rounded-xl font-bold text-xs border transition-colors ${isCompleted ? 'bg-gray-200 text-gray-700 border-gray-300' : 'bg-purple-600 text-white border-purple-600'}">
+                        ${isCompleted ? 'Marcar Incompleto' : 'Marcar Hecho'}
+                    </button>
+                </div>
+            `;
+
+            document.getElementById('days-list-container').classList.add('hidden');
+            document.getElementById('day-detail-container').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeDay() {
+            document.getElementById('day-detail-container').classList.add('hidden');
+            document.getElementById('days-list-container').classList.remove('hidden');
+        }
+
+        // Control de Completados (LocalStorage)
+        function toggleComplete(event, diaId) {
+            event.stopPropagation(); // Evita abrir el detalle al dar click en el checkbox
+            let completedDays = JSON.parse(localStorage.getItem('completed_days_ora') || '[]');
+            
+            if (completedDays.includes(diaId)) {
+                completedDays = completedDays.filter(id => id !== diaId);
+            } else {
+                completedDays.push(diaId);
+            }
+            
+            localStorage.setItem('completed_days_ora', JSON.stringify(completedDays));
+            renderDaysGrid();
+            updateProgressBar();
+        }
+
+        function inlineToggleComplete(diaId) {
+            let completedDays = JSON.parse(localStorage.getItem('completed_days_ora') || '[]');
+            if (completedDays.includes(diaId)) {
+                completedDays = completedDays.filter(id => id !== diaId);
+            } else {
+                completedDays.push(diaId);
+            }
+            localStorage.setItem('completed_days_ora', JSON.stringify(completedDays));
+            renderDaysGrid();
+            updateProgressBar();
+            showDay(diaId); // Refrescar vista interna
+        }
+
+        function updateProgressBar() {
+            const completedDays = JSON.parse(localStorage.getItem('completed_days_ora') || '[]');
+            const total = devocionales.length;
+            const percentage = (completedDays.length / total) * 100;
+            
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-text').innerText = `${completedDays.length}/${total} Días`;
+        }
+
+        // Compartir Devocional + Geolocalización via WhatsApp
+        function shareWhatsApp(diaId) {
+            const item = devocionales.find(d => d.dia === diaId);
+            if (!item) return;
+
+            const text = `*El Poder de la Mujer que Ora* ✨\n` +
+                         `*Día ${item.dia}: ${item.titulo}*\n\n` +
+                         `📖 *Versículo:* ${item.versiculo}\n"${item.texto_versiculo}"\n\n` +
+                         `📍 *Ubicación del Clamor:* ${userLocation}\n\n` +
+                         `🙏 *Mi oración hoy:* "${item.oracion}"\n\n` +
+                         `_App creada por VIBRAS POSITIVAS HM_`;
+
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // Petición de Oración Rápida
+        function sendQuickPrayer() {
+            const promptPrayer = prompt("Escribe tu petición de oración urgente para enviarla por WhatsApp:");
+            if (!promptPrayer) return;
+
+            const text = `🚨 *PETICIÓN URGENTE DE ORACIÓN*\n\n` +
+                         `"${promptPrayer}"\n\n` +
+                         `📍 *Enviado desde:* ${userLocation}\n\n` +
+                         `_Unidas en cadena de oración - VIBRAS POSITIVAS HM_`;
+
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // Service Worker en línea para soporte PWA offline básico
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdmZXRjaCcsIGZ1bmN0aW9uKGV2ZW50KSB7IH0pOw==');
+            });
+        }
+    </script>
+</body>
+</html>
